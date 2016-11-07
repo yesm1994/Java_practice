@@ -2,17 +2,17 @@
  * Created by Steven on 2016/11/7.
  */
 import java.io.*;
+import java.util.Enumeration;
+import java.util.Vector;
+
 public class CreatFile {
-    private static final String PATH = "F:/file/temp.txt";
-    private static final String OUT_PATH = "F:/file/out.txt";
-    private static final String OBJECT_PATH = "F:/Object/Student.txt";
     private static File f = null;
     private static File out = null;
     private static File objectFile = null;
     public void creatFile(){
-        f = new File(PATH);
-        out = new File(OUT_PATH);
-        objectFile = new File(OBJECT_PATH);
+        f = new File(Constants.PATH);
+        out = new File(Constants.OUT_PATH);
+        objectFile = new File(Constants.OBJECT_PATH);
         try {
             f.createNewFile();
             out.createNewFile();
@@ -110,7 +110,59 @@ public class CreatFile {
         }
     }
 
-    public void 
+    public void pushbackStream(){
+        String str = new String("Hello,World!");
+        PushbackInputStream pushbackInputStream = null;
+        ByteArrayInputStream byteArrayInputStream = null;
+        byteArrayInputStream = new ByteArrayInputStream(str.getBytes());
+        pushbackInputStream = new PushbackInputStream(byteArrayInputStream);
+        int index = 0;
+        try {
+            while((index = pushbackInputStream.read()) != -1){
+                if(index == ','){
+                    pushbackInputStream.unread(index);
+                    index = pushbackInputStream.read();
+                    System.out.println((char)index);
+                }else {
+                    System.out.print((char)index);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sequeceStream(){
+        SequenceInputStream sequenceInputStream = null;
+        BufferedOutputStream bufferedOutputStream = null;
+        try {
+            Vector<InputStream> vector = new Vector<InputStream>();
+            vector.addElement(new FileInputStream(f));
+            vector.addElement(new FileInputStream(out));
+            vector.addElement(new FileInputStream(objectFile));
+            Enumeration<InputStream> enumeration = vector.elements();
+            sequenceInputStream = new SequenceInputStream(enumeration);
+
+            bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(out));
+
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while((len = sequenceInputStream.read()) != -1)
+            {
+                bufferedOutputStream.write(buffer,0,len);
+                bufferedOutputStream.flush();
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+        }finally {
+            try {
+                sequenceInputStream.close();
+                bufferedOutputStream.close();
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
 
     public static void run(){
         CreatFile cf = new CreatFile();
@@ -118,6 +170,8 @@ public class CreatFile {
         cf.computeByteStream();
         cf.objectInputOutput();
         cf.objectDataReadAndWrite();
+        cf.pushbackStream();
+        cf.sequeceStream();
     }
 }
 
