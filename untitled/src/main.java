@@ -3,10 +3,12 @@
  */
 
 
-import java.sql.*;
+import com.steven.io.CharStream;
+import com.steven.util.DateApp;
+import com.steven.util.RandomApp;
 
-public class main {
+public class Main {
     public static void main(String[] args){
-        CharStream.run();
+        DateApp.run();
     }
 }
